@@ -1,16 +1,16 @@
 /*
-* Tencent is pleased to support the open source community by making Mars available.
-* Copyright (C) 2016 THL A29 Limited, a Tencent company. All rights reserved.
-*
-* Licensed under the MIT License (the "License"); you may not use this file except in 
-* compliance with the License. You may obtain a copy of the License at
-* http://opensource.org/licenses/MIT
-*
-* Unless required by applicable law or agreed to in writing, software distributed under the License is
-* distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
-* either express or implied. See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Tencent is pleased to support the open source community by making Mars available.
+ * Copyright (C) 2016 THL A29 Limited, a Tencent company. All rights reserved.
+ *
+ * Licensed under the MIT License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ * http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.tencent.mars.sample;
 
@@ -31,6 +31,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -54,7 +55,7 @@ public class ConversationActivity extends AppCompatActivity {
 
     private static final String TAG = "Mars.Sample.ConversationActivity";
 
-    private static final String CONVERSATION_HOST = "marsopen.cn"; // using preset ports
+    private static final String CONVERSATION_HOST = "192.168.8.108"; // using preset ports
 
     private int conversationFilterType = Main.ConversationListRequest.FilterType.DEFAULT_VALUE;
 
@@ -72,6 +73,8 @@ public class ConversationActivity extends AppCompatActivity {
 
     @BindView(R.id.main_page_refreshtext)
     TextView textView;
+    @BindView(R.id.btnJump)
+    Button btnJump;
 
     private ConversationListAdapter conversationListAdapter;
 
@@ -101,7 +104,15 @@ public class ConversationActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
+        btnJump.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ConversationActivity.this, ChatActivity.class);
+                intent.putExtra("conversation_id", "哈哈哈");
+                intent.putExtra("notice", "哦哦哦哦哦");
+                startActivity(intent);
+            }
+        });
         conversationListView.setLayoutManager(new LinearLayoutManager(this));
         conversationListView.setAdapter(conversationListAdapter);
         conversationListView.setItemAnimator(new DefaultItemAnimator());
@@ -268,7 +279,7 @@ public class ConversationActivity extends AppCompatActivity {
         switch (requestCode) {
             case Constants.STORAGE_REQUESTCODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                  //  SampleApplicaton.openXlog();
+                    //  SampleApplicaton.openXlog();
 
                 } else {
                     //
