@@ -115,7 +115,7 @@ int (*longlink_unpack)(const AutoBuffer& _packed, uint32_t& _cmdid, uint32_t& _s
 };
 
 
-#define NOOP_CMDID 6
+#define NOOP_CMDID 24
 #define SIGNALKEEP_CMDID 243
 #define PUSH_DATA_TASKID 0
 
