@@ -30,7 +30,7 @@ public class MarsServiceProxyTest {
     private static final String TAG = "MarsServiceProxyTest";
 
     @TaskProperty(
-        host = "marsopen.cn",
+        host = "192.168.8.108",
         path = "/mars/sendmessage"
     )
     class TestJsonMarsTaskWrapper extends JsonMarsTaskWrapper {
