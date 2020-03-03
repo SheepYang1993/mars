@@ -104,7 +104,8 @@ dependencies {
         implementation "com.tencent.mars:mars-wrapper:${WRAPPER_VERSION_NAME}"
     }
     implementation 'com.google.code.gson:gson:2.8.5'
-    implementation "com.tencent.mars:mars-core:${VERSION_NAME}"
+//    implementation "com.tencent.mars:mars-core:${VERSION_NAME}"
+    implementation project(':mars-core')
 
     androidTestImplementation 'com.android.support.test:runner:0.5'
     androidTestImplementation 'com.android.support.test:rules:0.5'

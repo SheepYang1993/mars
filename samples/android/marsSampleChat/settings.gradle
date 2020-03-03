@@ -1,4 +1,5 @@
 rootProject.name = 'mars-android-sample'
 
 include ':app'
+include ':mars-core'
 include ':wrapper'
