@@ -32,6 +32,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Mars Service Proxy for component callers
  * <p></p>
+ *
+ * 该类仅仅是个代理类，维护了1个队列queue，每隔50毫秒检测有没有消息，有就发送
+ * 具体的api实现，是调用MarsService接口的实现类来实现，即SERVICE_DEFAULT_CLASSNAME => MarsServiceNative.class
+ *
  * Created by zhaoyuan on 16/2/26.
  */
 public class MarsServiceProxy implements ServiceConnection {

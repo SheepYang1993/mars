@@ -14,23 +14,23 @@ import java.util.Arrays;
  */
 public class Mars {
 
-    public static void loadDefaultMarsLibrary(){
+    public static void loadDefaultMarsLibrary() {
         try {
             System.loadLibrary("c++_shared");
             System.loadLibrary("marsxlog");
             System.loadLibrary("marsstn");
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             Log.e("mars.Mars", "", e);
         }
     }
 
-    private static volatile boolean hasInitialized  = false;
+    private static volatile boolean hasInitialized = false;
 
     /**
      * APP创建时初始化平台回调 必须在onCreate方法前调用
+     *
      * @param _context
-     * @param _handler
+     * @param _handler 这个是应用层传下来的new Handler(Looper.getMainLooper())
      */
     public static void init(Context _context, Handler _handler) {
         PlatformComm.init(_context, _handler);
@@ -40,16 +40,15 @@ public class Mars {
     /**
      * APP启动时首次调用onCreate前必须显示调用 init(Context _context, Handler _handler)方法 和
      * SignalTransmitNetwork设置长连接和短连接域名ip
+     *
      * @param isFirstStartup 是否首次进行mars create
      */
     public static void onCreate(boolean isFirstStartup) {
         if (isFirstStartup && hasInitialized) {
             BaseEvent.onCreate();
-        }
-        else if (!isFirstStartup) {
+        } else if (!isFirstStartup) {
             BaseEvent.onCreate();
-        }
-        else {
+        } else {
             /**
              * 首次启动但未调用init 无法进行BaseEvent create
              */
@@ -58,7 +57,7 @@ public class Mars {
     }
 
     /**
-     *  APP退出时 销毁组件
+     * APP退出时 销毁组件
      */
     public static void onDestroy() {
         BaseEvent.onDestroy();
