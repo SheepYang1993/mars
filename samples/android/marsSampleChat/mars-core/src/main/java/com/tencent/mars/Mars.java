@@ -14,6 +14,9 @@ import java.util.Arrays;
  */
 public class Mars {
 
+    /**
+     * 加载默认的so库
+     */
     public static void loadDefaultMarsLibrary() {
         try {
             System.loadLibrary("c++_shared");

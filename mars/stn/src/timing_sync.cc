@@ -84,6 +84,7 @@ void TimingSync::OnActiveChanged(bool _is_actived)
 
 void TimingSync::OnNetworkChange()
 {
+	//取消了一个警报器，具体干什么的还不清楚
     if (alarm_.IsWaiting())
     {
          alarm_.Cancel();

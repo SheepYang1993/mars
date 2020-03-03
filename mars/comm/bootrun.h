@@ -34,7 +34,8 @@ __inline int __boot_run_atexit(void (*func)(void)) { return atexit(func);}
 #ifdef __cplusplus
 }
 #endif
-
+//全局静态变量会在一开始就初始化
+//实际上调用了__boot_run_atstartup
 #define BOOT_RUN_STARTUP(func) VARIABLE_IS_NOT_USED static int __anonymous_run_variable_startup_##func = __boot_run_atstartup(func)
 #define BOOT_RUN_EXIT(func) VARIABLE_IS_NOT_USED static int __anonymous_run_variable_exit_##func = __boot_run_atexit(func)
 

@@ -33,10 +33,20 @@ public class NetworkSignalUtil {
         return 0;
     }
 
+    /**
+     * 获取手机信号强度
+     *
+     * @return
+     */
     public static long getGSMSignalStrength() {
         return strength;
     }
 
+    /**
+     * 获取wifi信号强度
+     *
+     * @return
+     */
     public static long getWifiSignalStrength() {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo info = wifiManager.getConnectionInfo();
@@ -50,15 +60,21 @@ public class NetworkSignalUtil {
         return 0;
     }
 
+    /**
+     * 计算并记录手机信号强度
+     *
+     * @param sig
+     */
     private static void calSignalStrength(SignalStrength sig) {
         int nSig = 0;
-        if (sig.isGsm())
+        if (sig.isGsm()) {
             nSig = sig.getGsmSignalStrength();
-        else
+        } else {
             nSig = (sig.getCdmaDbm() + 113) / 2;
-        if (sig.isGsm() && nSig == 99)
+        }
+        if (sig.isGsm() && nSig == 99) {
             strength = 0;
-        else {
+        } else {
             strength = (long) (nSig * ((float) 100 / (float) 31));
             strength = (strength > 100 ? 100 : strength);
             strength = (strength < 0 ? 0 : strength);

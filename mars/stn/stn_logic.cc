@@ -110,7 +110,7 @@ static void onExceptionCrash() {
 }
 
 static void onNetworkChange() {
-
+	//网络状态切换，调用/mars/stn/src/timing_sync.cc的OnNetworkChange
     STN_WEAK_CALL(OnNetworkChange());
 }
     
@@ -147,6 +147,7 @@ static void __initbind_baseprjevent() {
     GetSignalOnDestroy().connect(&onDestroy);   //low priority signal func
     GetSignalOnSingalCrash().connect(&onSingalCrash);
     GetSignalOnExceptionCrash().connect(&onExceptionCrash);
+	//接收到网络状态切换
     GetSignalOnNetworkChange().connect(5, &onNetworkChange);    //define group 5
 
     
@@ -156,7 +157,7 @@ static void __initbind_baseprjevent() {
     
     GetSignalOnNetworkDataChange().connect(&OnNetworkDataChange);
 }
-
+//在/mars-master/mars/comm/bootrun.h里面初始化
 BOOT_RUN_STARTUP(__initbind_baseprjevent);
     
 void SetCallback(Callback* const callback) {

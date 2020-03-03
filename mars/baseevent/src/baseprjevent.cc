@@ -51,6 +51,7 @@ boost::signals2::signal<void (bool _isForeground)>& GetSignalOnForeground()
 
 boost::signals2::signal<void ()>& GetSignalOnNetworkChange()
 {
+	// 监听到网络状态切换，发送信号到/mars/stn/stn_logic.cc的GetSignalOnNetworkChange().connect(&onNetworkChange);
 	static boost::signals2::signal<void ()> SignalOnNetworkChange;
 	return SignalOnNetworkChange;
 }
