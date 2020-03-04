@@ -166,7 +166,7 @@ bool LongLink::Send(const AutoBuffer& _body, const AutoBuffer& _extension, const
     if (kConnected != connectstatus_) return false;
 
     xassert2(tracker_.get());
-    
+    //将需要传输的数据压入队列中
     lstsenddata_.push_back(std::make_pair(_task, move_wrapper<AutoBuffer>(AutoBuffer())));
     longlink_pack(_task.cmdid, _task.taskid, _body, _extension, lstsenddata_.back().second, tracker_.get());
     lstsenddata_.back().second->Seek(0, AutoBuffer::ESeekStart);
