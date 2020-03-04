@@ -87,6 +87,7 @@ static void onCreate() {
 
     xinfo2(TSF"stn oncreate");
     ActiveLogic::Singleton::Instance();
+	//初始化NetCore单例
     NetCore::Singleton::Instance();
 
 }

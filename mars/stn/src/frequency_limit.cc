@@ -26,6 +26,7 @@
 #include "mars/stn/stn.h"
 
 #define MAX_RECORD_COUNT (30)
+//检测记录的次数
 #define RECORD_INTERCEPT_COUNT (105)
 
 #define NOT_CLEAR_INTERCEPT_COUNT_RETRY (99)
@@ -41,7 +42,7 @@ FrequencyLimit::FrequencyLimit()
 
 FrequencyLimit::~FrequencyLimit()
 {}
-
+//检测调用频率
 bool FrequencyLimit::Check(const mars::stn::Task& _task, const void* _buffer, int _len, unsigned int& _span) {
     xverbose_function();
 
@@ -61,9 +62,10 @@ bool FrequencyLimit::Check(const mars::stn::Task& _task, const void* _buffer, in
     int find_index = __LocateIndex(hash);
 
     if (0 <= find_index) {
+		// 有相同记录存在
     	_span = __GetLastUpdateTillNow(find_index);
         __UpdateRecord(find_index);
-
+		// 检测记录的次数是否超出边界105 => RECORD_INTERCEPT_COUNT,如果是返回false
         if (!__CheckRecord(find_index)) {
             xerror2(TSF"Anti-Avalanche had Catch Task, Task Info: ptr=%0, cmdid=%1, need_authed=%2, cgi:%3, channel_select=%4, limit_flow=%5",
                     &_task, _task.cmdid, _task.need_authed, _task.cgi, _task.channel_select, _task.limit_flow);
@@ -74,6 +76,7 @@ bool FrequencyLimit::Check(const mars::stn::Task& _task, const void* _buffer, in
             return false;
         }
     } else {
+		// 没有相同记录存在，插入当前这条记录
         xdebug2(TSF"InsertRecord Task Info: ptr=%0, cmdid=%1, need_authed=%2, cgi:%3, channel_select=%4, limit_flow=%5",
                 &_task, _task.cmdid, _task.need_authed, _task.cgi, _task.channel_select, _task.limit_flow);
 

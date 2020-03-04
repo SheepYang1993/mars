@@ -90,7 +90,7 @@ bool LongLinkTaskManager::StartTask(const Task& _task) {
 
     lst_cmd_.push_back(task);
     lst_cmd_.sort(__CompareTask);
-
+	//真正开始执行长连接任务
     __RunLoop();
     return true;
 }
@@ -189,7 +189,9 @@ void LongLinkTaskManager::__RunLoop() {
         return;
     }
 
+	//设置超时
     __RunOnTimeout();
+	//开始执行任务
     __RunOnStartTask();
 
     if (!lst_cmd_.empty()) {
@@ -280,12 +282,14 @@ void LongLinkTaskManager::__RunOnStartTask() {
         std::list<TaskProfile>::iterator next = first;
         ++next;
 
+		//跳过正在执行的任务
         if (first->running_id) {
             ++sent_count;
             first = next;
             continue;
         }
-
+		
+		//任务如果超过重试次数就跳过
         //重试间隔, 不影响第一次发送的任务
         if (first->task.retry_count > first->remain_retry_count && !canretry) {
             xdebug2_if(canprint, TSF"retry interval:%0, curtime:%1, lastbatcherrortime_:%2, curtime-m_lastbatcherrortime:%3",
@@ -308,13 +312,13 @@ void LongLinkTaskManager::__RunOnStartTask() {
         }
         xinfo2(TSF"host ip to callback is %_ ",host);
 
-        // make sure login
+        // make sure login，验证是否登录
         if (first->task.need_authed) {
             if (!ismakesureauthruned) {
                 ismakesureauthruned = true;
                 ismakesureauthsuccess = MakesureAuthed(host);
             }
-
+			//登录验证失败就跳过该任务
             if (!ismakesureauthsuccess) {
                 xinfo2_if(curtime % 3 == 0, TSF"makeSureAuth retsult=%0", ismakesureauthsuccess);
                 first = next;
@@ -327,12 +331,14 @@ void LongLinkTaskManager::__RunOnStartTask() {
         int error_code = 0;
 
         if (!first->antiavalanche_checked) {
+			//执行上层的Req2Buf方法
 			if (!Req2Buf(first->task.taskid, first->task.user_context, bufreq, buffer_extension, error_code, Task::kChannelLong, host)) {
 				__SingleRespHandle(first, kEctEnDecode, error_code, kTaskFailHandleTaskEnd, longlink_->Profile());
 				first = next;
 				continue;
 			}
 			// 雪崩检测
+			//实际调用/mars/stn/src/anti_avalanche.cc的AntiAvalanche::Check
 			xassert2(fun_anti_avalanche_check_);
 			if (!fun_anti_avalanche_check_(first->task, bufreq.Ptr(), (int)bufreq.Length())) {
 				__SingleRespHandle(first, kEctLocal, kEctLocalAntiAvalanche, kTaskFailHandleTaskEnd, longlink_->Profile());
@@ -343,6 +349,8 @@ void LongLinkTaskManager::__RunOnStartTask() {
         }
 
         xassert2(first->antiavalanche_checked);
+		
+		//再次确认长连接是否连接
 		if (!longlinkconnectmon_->MakeSureConnected()) {
             if (0 != first->task.channel_id) {
                 __SingleRespHandle(first, kEctLocal, kEctLocalChannelID, kTaskFailHandleTaskEnd, longlink_->Profile());
@@ -400,6 +408,7 @@ void LongLinkTaskManager::__RunOnStartTask() {
     }
 }
 
+//只发送消息，不需要服务端响应（不知道是不是这个意思，存疑）
 bool LongLinkTaskManager::__SingleRespHandle(std::list<TaskProfile>::iterator _it, ErrCmdType _err_type, int _err_code, int _fail_handle, const ConnectProfile& _connect_profile) {
     xverbose_function();
     xassert2(kEctServer != _err_type);

@@ -56,6 +56,7 @@ namespace baseevent {
 extern "C" {
 
 JNIEXPORT void JNICALL Java_com_tencent_mars_BaseEvent_onCreate(JNIEnv* env, jclass) {
+	//见/mars/stn/stn_logic.cc#88  => xinfo2(TSF"stn oncreate");
     mars::baseevent::OnCreate();
 }
 

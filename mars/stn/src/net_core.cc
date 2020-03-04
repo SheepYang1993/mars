@@ -296,15 +296,15 @@ void NetCore::StartTask(const Task& _task) {
 #endif
 
     bool start_ok = false;
+//前面都是一堆的检查项，只要不通过就执行OnTaskEnd并返回
 
+//再次确认长连接是否连上
 #ifdef USE_LONG_LINK
-
     if (LongLink::kConnected != longlink_task_manager_->LongLinkChannel().ConnectStatus()
             && (Task::kChannelLong & task.channel_select) && ActiveLogic::Singleton::Instance()->IsForeground()
 
             && (15 * 60 * 1000 >= gettickcount() - ActiveLogic::Singleton::Instance()->LastForegroundChangeTime()))
         longlink_task_manager_->getLongLinkConnectMonitor().MakeSureConnected();
-
 #endif
 
     xgroup2() << group;
@@ -321,6 +321,7 @@ void NetCore::StartTask(const Task& _task) {
         }
 
         if (bUseLongLink)
+			//开始执行长连接任务，见/mars/stn/src/longlink_task_manager.cc
             start_ok = longlink_task_manager_->StartTask(task);
         else
 #endif

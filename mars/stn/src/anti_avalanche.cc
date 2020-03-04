@@ -41,15 +41,20 @@ AntiAvalanche::~AntiAvalanche() {
     delete frequency_limit_;
 }
 
+//雪崩检测，返回false代表不进行这个任务；返回true则表示可以执行该任务
 bool AntiAvalanche::Check(const Task& _task, const void* _buffer, int _len) {
     xverbose_function();
 
     unsigned int span = 0;
+	//检测调用频率
+	//实际调用/mars/stn/src/frequency_limit.cc的FrequencyLimit::Check
     if (!frequency_limit_->Check(_task, _buffer, _len, span)){
 		ReportTaskLimited(kFrequencyLimit, _task, span);
     	return false;
     }
 
+	//移动网络下，还要再进行一次流量限制检测
+	//实际调用/mars/stn/src/frequency_limit.cc的FlowLimit::Check
     if (kMobile == getNetInfo() && !flow_limit_->Check(_task, _buffer, _len)) {
     	ReportTaskLimited(kFlowLimit, _task, (unsigned int&)_len);
 		return false;

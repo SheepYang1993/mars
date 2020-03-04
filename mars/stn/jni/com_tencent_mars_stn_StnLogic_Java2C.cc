@@ -231,7 +231,8 @@ JNIEXPORT void JNICALL Java_com_tencent_mars_stn_StnLogic_startTask
 		task.user_context = _env->NewGlobalRef(_user_context);
 		_env->DeleteLocalRef(_user_context);
 	}
-
+	//前面都是在做转换，从Java的StnLogic的Task转换成为底层native的Task
+	//然后真正开始一个任务，会直接走到NetCore中去，见/mars/stn/src/net_core.cc的NetCore::StartTask
 	StartTask(task);
 }
 
