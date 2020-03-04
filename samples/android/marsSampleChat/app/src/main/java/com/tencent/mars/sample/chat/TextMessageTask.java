@@ -74,7 +74,7 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
 
     @Override
     public byte[] req2buf() {
-        return new byte[]{88};
+        return new byte[]{88, 77, 66, 55, 44, 33, 22, 11};
 //        return super.req2buf();
     }
 
