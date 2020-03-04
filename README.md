@@ -1,3 +1,7 @@
+## Mars 源码解读注释
+配合大佬文章阅读更佳
+https://segmentfault.com/a/1190000008964528
+
 ## Mars
 
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/Tencent/mars/blob/master/LICENSE)
