@@ -16,15 +16,10 @@ import android.util.Log;
 public class BaseEvent {
 
     public static native void onCreate();
-
     public static native void onDestroy();
-
     public static native void onNetworkChange();
-
     public static native void onForeground(final boolean forground);
-
     public static native void onSingalCrash(int sig);
-
     public static native void onExceptionCrash();
 
     /**
@@ -56,19 +51,14 @@ public class BaseEvent {
             checkConnInfo(context, netInfo);
         }
 
-        /**
-         * 检查连接信息
-         *
-         * @param context
-         * @param activeNetInfo
-         */
         public void checkConnInfo(final Context context, final NetworkInfo activeNetInfo) {
 
             if (activeNetInfo == null) {
                 lastActiveNetworkInfo = null;
                 lastWifiInfo = null;
                 BaseEvent.onNetworkChange();
-            } else if (activeNetInfo.getDetailedState() != NetworkInfo.DetailedState.CONNECTED) {
+            }
+            else if (activeNetInfo.getDetailedState() != NetworkInfo.DetailedState.CONNECTED) {
 
                 if (lastConnected) {
                     lastActiveNetworkInfo = null;
@@ -77,7 +67,8 @@ public class BaseEvent {
                 }
 
                 lastConnected = false;
-            } else {
+            }
+            else {
                 if (isNetworkChange(context, activeNetInfo)) {
                     BaseEvent.onNetworkChange();
                 }
@@ -92,7 +83,7 @@ public class BaseEvent {
             if (isWifi) {
                 WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
                 WifiInfo wi = wifiManager.getConnectionInfo();
-                if (wi != null && lastWifiInfo != null && lastWifiInfo.getBSSID() != null && lastWifiInfo.getSSID() != null
+                if (wi != null && lastWifiInfo != null && lastWifiInfo.getBSSID() != null && lastWifiInfo.getSSID() != null 
                         && lastWifiInfo.getBSSID().equals(wi.getBSSID())
                         && lastWifiInfo.getSSID().equals(wi.getSSID())
                         && lastWifiInfo.getNetworkId() == wi.getNetworkId()) {
