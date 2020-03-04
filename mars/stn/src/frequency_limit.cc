@@ -53,6 +53,7 @@ bool FrequencyLimit::Check(const mars::stn::Task& _task, const void* _buffer, in
     unsigned long interval = time_cur - itime_record_clear_;
 
     if (RUN_CLEAR_RECORDS_INTERVAL_MINUTE <= interval) {
+		//每隔1分钟清除一次记录
         xdebug2(TSF"__ClearRecord interval=%0, timeCur=%1, itimeRecordClear=%2", interval, time_cur, itime_record_clear_);
         itime_record_clear_ = time_cur;
         __ClearRecord();

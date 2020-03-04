@@ -27,7 +27,9 @@
 #include "mars/stn/stn.h"
 
 #if true
+//非活跃状态下限制，一小时2M
 static const uint64_t kInactiveSpeed = (20 * 1024 * 1024 / 3600);
+//活跃状态下限制，一小时8M
 static const uint64_t kActiveSpeed = (80 * 1024 * 1024 / 3600);
 static const uint64_t kInactiveMinvol = (60 * 1024 * 1024);
 static const uint64_t kMaxVol = (80 * 1024 * 1024);
@@ -51,7 +53,7 @@ FlowLimit::~FlowLimit()
 
 bool FlowLimit::Check(const mars::stn::Task& _task, const void* _buffer, int _len) {
     xverbose_function();
-
+	//任务没有流量限制，就不检测
     if (!_task.limit_flow) {
         return true;
     }
