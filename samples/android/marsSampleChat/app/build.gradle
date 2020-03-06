@@ -107,6 +107,7 @@ dependencies {
 //    implementation "com.tencent.mars:mars-core:${VERSION_NAME}"
     implementation project(':mars-core')
 
+    implementation 'com.blankj:utilcode:1.26.0'
     androidTestImplementation 'com.android.support.test:runner:0.5'
     androidTestImplementation 'com.android.support.test:rules:0.5'
 }

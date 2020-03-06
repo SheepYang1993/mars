@@ -201,7 +201,7 @@ public class ChatActivity extends AppCompatActivity implements Observer {
 
         editTextContent.setText("");
 
-        MarsServiceProxy.send(new TextMessageTask(topicName, message)
+        MarsServiceProxy.send(new TextMessageTask(0xe3, "13055253351", new byte[]{0x0a, 0x0b, 0x0c, 0x0d})
                 .onOK(new Runnable() {
 
                     @Override
