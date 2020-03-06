@@ -29,6 +29,7 @@ import com.tencent.mars.sample.wrapper.remote.NanoMarsTaskWrapper;
 import com.tencent.mars.stn.StnLogic;
 import com.tencent.mars.xlog.Log;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -114,11 +115,76 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
         if (body != null) {
             System.arraycopy(body, 0, result, byteSize - 2 - body.length, body.length);
         }
+        byte[] marsHeader = getMockMarsHeader(byteSize);
+        //根据allByte生成校验码
+        byte[] allByte = new byte[marsHeader.length + result.length - 2];
+        System.arraycopy(marsHeader, 0, allByte, 0, marsHeader.length);
+        System.arraycopy(result, 0, allByte, marsHeader.length, result.length - 2);
+        byte code = 0;
+        code = getCheckCode(allByte);
         //校验码，1个字节
-        result[byteSize - 2] = 0x03;
+        result[byteSize - 2] = code;
         //包尾，1个字节
         result[byteSize - 1] = 0x0d;
         return result;
+    }
+
+    /**
+     * 生成校验码
+     *
+     * @param bytes
+     * @return
+     */
+    private byte getCheckCode(byte[] bytes) {
+        byte code = 0;
+        for (byte b : bytes) {
+            code ^= b;
+        }
+        return code;
+    }
+
+    private byte[] getMockMarsHeader(int bodySize) {
+        byte[] marsHeader = new byte[22];
+        marsHeader[0] = 0x29;
+        marsHeader[1] = 0x29;
+
+        //header_length
+        marsHeader[2] = 0x00;
+        marsHeader[3] = 0x00;
+        marsHeader[4] = 0x00;
+        marsHeader[5] = 0x16;
+
+        //client_version
+        marsHeader[6] = 0x00;
+        marsHeader[7] = 0x00;
+        marsHeader[8] = 0x00;
+        marsHeader[9] = (byte) 0xc8;
+
+        //cmdid
+        marsHeader[10] = 0x00;
+        marsHeader[11] = 0x00;
+        marsHeader[12] = 0x00;
+        marsHeader[13] = 0x03;
+
+        //seq
+        marsHeader[14] = 0x00;
+        marsHeader[15] = 0x00;
+        marsHeader[16] = 0x00;
+        marsHeader[17] = 0x02;
+
+        //body_length
+        byte[] bodyLength = getLength(bodySize);
+        System.arraycopy(bodyLength, 0, marsHeader, marsHeader.length - bodyLength.length, bodyLength.length);
+        return marsHeader;
+    }
+
+    private byte[] getLength(int num) {
+        byte[] bytes = new byte[4];
+        bytes[0] = (byte) (num >> 24);
+        bytes[1] = (byte) (num >> 16);
+        bytes[2] = (byte) (num >> 8);
+        bytes[3] = (byte) num;
+        return bytes;
     }
 
     /**
@@ -146,13 +212,11 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
             for (int i = 0; i < bytesOrigin.length; i++) {
                 bytes[i] = 0xff & bytesOrigin[i];
             }
-            Log.v("测试测试", "服务端返回结果:" + Arrays.toString(bytes));
             onPostDecode(null);
             return StnLogic.RESP_FAIL_HANDLE_NORMAL;
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.v("测试测试", "服务端返回结果:异常了");
         }
 
         return StnLogic.RESP_FAIL_HANDLE_TASK_END;

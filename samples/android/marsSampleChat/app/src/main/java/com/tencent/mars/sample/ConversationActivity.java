@@ -107,10 +107,7 @@ public class ConversationActivity extends AppCompatActivity {
         btnJump.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(ConversationActivity.this, ChatActivity.class);
-                intent.putExtra("conversation_id", "哈哈哈");
-                intent.putExtra("notice", "哦哦哦哦哦");
-                startActivity(intent);
+                toChat();
             }
         });
         conversationListView.setLayoutManager(new LinearLayoutManager(this));
@@ -150,9 +147,18 @@ public class ConversationActivity extends AppCompatActivity {
                         + "      * Mars Sample未运行时也将无法收到消息推送\n\n"
                         + "   3. 消息使用服务器处理时间排序，并非消息本身的时序"
         );
-        new AlertDialog.Builder(this)
-                .setTitle("Mars Sample是一个快速聊天工具")
-                .setIcon(android.R.drawable.ic_dialog_info).setView(tv).setPositiveButton("确定", null).create().show();
+//        new AlertDialog.Builder(this)
+//                .setTitle("Mars Sample是一个快速聊天工具")
+//                .setIcon(android.R.drawable.ic_dialog_info).setView(tv).setPositiveButton("确定", null).create().show();
+
+        toChat();
+    }
+
+    private void toChat() {
+        Intent intent = new Intent(ConversationActivity.this, ChatActivity.class);
+        intent.putExtra("conversation_id", "哈哈哈");
+        intent.putExtra("notice", "哦哦哦哦哦");
+        startActivity(intent);
     }
 
     @Override

@@ -22,7 +22,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputFilter;
+import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
@@ -66,6 +68,7 @@ public class ChatActivity extends AppCompatActivity implements Observer {
     private String topicName;
 
     private ChatMsgViewAdapter adapter;// 消息视图的Adapter
+    private String mPhone;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -123,9 +126,10 @@ public class ChatActivity extends AppCompatActivity implements Observer {
 
         if (!SampleApplicaton.hasSetUserName) {
             final EditText editText = new EditText(this);
+            editText.setText("13055253351");
             editText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(12)});
             final AlertDialog d = new AlertDialog.Builder(this)
-                    .setTitle("首次进入话题请输入昵称")
+                    .setTitle("请输入手机号")
                     .setIcon(android.R.drawable.ic_dialog_info)
                     .setView(editText)
                     .setPositiveButton("确定", null).create();
@@ -140,6 +144,7 @@ public class ChatActivity extends AppCompatActivity implements Observer {
                             if (nick.length() > 0 && !nick.trim().equals("")) {
                                 SampleApplicaton.accountInfo.userName = nick.trim();
                                 SampleApplicaton.hasSetUserName = true;
+                                mPhone = nick.trim();
                             } else {
                                 return;
                             }
@@ -151,6 +156,7 @@ public class ChatActivity extends AppCompatActivity implements Observer {
             });
             d.show();
         }
+        editTextContent.setText("0a0b0c0d0e0f");
     }
 
     @Override
@@ -180,7 +186,7 @@ public class ChatActivity extends AppCompatActivity implements Observer {
 
     public void onClickBtnSend() {
 
-        final String message = editTextContent.getText().toString();
+        String message = editTextContent.getText().toString();
         if (message.length() <= 0 || message.trim().equals("")) {
             new AlertDialog.Builder(this)
                     .setTitle("不能输入空消息")
@@ -200,8 +206,11 @@ public class ChatActivity extends AppCompatActivity implements Observer {
         ChatDataCore.getInstance().addData(topicName, entity);
 
         editTextContent.setText("");
-
-        MarsServiceProxy.send(new TextMessageTask(0xe3, "13055253351", new byte[]{0x0a, 0x0b, 0x0c, 0x0d})
+        if (TextUtils.isEmpty(mPhone)) {
+            mPhone = "000000000000";
+        }
+        byte[] body = str2HexByte(message);
+        MarsServiceProxy.send(new TextMessageTask(0xe3, mPhone, body)
                 .onOK(new Runnable() {
 
                     @Override
@@ -218,4 +227,37 @@ public class ChatActivity extends AppCompatActivity implements Observer {
                 }));
     }
 
+    public static byte[] str2HexByte(String data) {
+        if (1 == data.length() % 2) {
+            return null;
+        } else {
+            byte[] li = new byte[data.length() / 2];
+            for (int i = 0; i < data.length(); i += 2) {
+                int cp1 = data.codePointAt(i);
+                int cp2 = data.codePointAt(i + 1);
+                li[i / 2] = (byte) (asc2Hex(cp1) << 4 | asc2Hex(cp2));
+            }
+            return li;
+        }
+    }
+
+    /**
+     * 字符asc码数值转为byte数值
+     *
+     * @param data
+     * @return
+     */
+    public static int asc2Hex(int data) {
+        int li;
+        if (data >= 0X30 && data <= 0X39) {//0-9
+            li = data - 0X30;
+        } else if (data >= 0X41 && data <= 0X5A) {//A-F
+            li = data - 0X37;
+        } else if (data >= 0X61 && data <= 0X7A) {//a-f
+            li = data - 0X57;
+        } else {
+            li = data;
+        }
+        return li;
+    }
 }
