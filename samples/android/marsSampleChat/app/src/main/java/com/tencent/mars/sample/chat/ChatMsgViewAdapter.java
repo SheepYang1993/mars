@@ -1,19 +1,20 @@
 /*
-* Tencent is pleased to support the open source community by making Mars available.
-* Copyright (C) 2016 THL A29 Limited, a Tencent company. All rights reserved.
-*
-* Licensed under the MIT License (the "License"); you may not use this file except in 
-* compliance with the License. You may obtain a copy of the License at
-* http://opensource.org/licenses/MIT
-*
-* Unless required by applicable law or agreed to in writing, software distributed under the License is
-* distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
-* either express or implied. See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Tencent is pleased to support the open source community by making Mars available.
+ * Copyright (C) 2016 THL A29 Limited, a Tencent company. All rights reserved.
+ *
+ * Licensed under the MIT License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ * http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.tencent.mars.sample.chat;
 
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.StringUtils;
 import com.tencent.mars.sample.R;
 
 import java.util.List;
@@ -33,6 +35,8 @@ import java.util.List;
  */
 public class ChatMsgViewAdapter extends BaseAdapter {
 
+    private final Context mContext;
+
     public static interface IMsgViewType {
         int IMVT_COM_MSG = 0;// 收到对方的消息
         int IMVT_TO_MSG = 1;// 自己发送出去的消息
@@ -44,6 +48,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 
     public ChatMsgViewAdapter(Context context, List<ChatMsgEntity> coll) {
         this.coll = coll;
+        mContext = context;
         inflater = LayoutInflater.from(context);
     }
 
@@ -82,7 +87,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        ChatMsgEntity entity = coll.get(position);
+        final ChatMsgEntity entity = coll.get(position);
         boolean isComMsg = entity.getMsgType();
 
         ViewHolder viewHolder = null;
@@ -96,17 +101,26 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 
             viewHolder = new ViewHolder();
             viewHolder.tvSendTime = (TextView) convertView
-                .findViewById(R.id.tv_sendtime);
+                    .findViewById(R.id.tv_sendtime);
             viewHolder.tvUserName = (TextView) convertView
-                .findViewById(R.id.tv_username);
+                    .findViewById(R.id.tv_username);
             viewHolder.tvContent = (TextView) convertView
-                .findViewById(R.id.tv_chatcontent);
+                    .findViewById(R.id.tv_chatcontent);
+
             viewHolder.isComMsg = isComMsg;
 
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
+        viewHolder.tvContent.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                ClipboardManager cmb = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                cmb.setText(entity.getMessage());
+                return false;
+            }
+        });
         viewHolder.tvSendTime.setText(entity.getDate());
         viewHolder.tvUserName.setText(entity.getName());
         viewHolder.tvContent.setText(entity.getMessage());
