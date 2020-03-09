@@ -31,4 +31,5 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
 //    implementation "com.tencent.mars:mars-core:${VERSION_NAME}"
     implementation project(':mars-core')
+    implementation 'com.blankj:utilcode:1.26.0'
 }

@@ -50,7 +50,7 @@ public class SampleApplicaton extends Application {
 
         @Override
         public String longLinkHost() {
-            return "192.168.8.108";
+            return "120.25.238.4";
         }
     }
 
@@ -71,7 +71,7 @@ public class SampleApplicaton extends Application {
         });
 
         // temporary fix: ip is invalid, ip:127.0.0.1. it will be remove in future.
-        StnLogic.setDebugIP("192.168.8.108", "127.0.0.1");
+        StnLogic.setDebugIP("120.25.238.4", "127.0.0.1");
         // NOTE: MarsServiceProxy is for client/caller
         // Initialize MarsServiceProxy for local client, can be moved to other place
         MarsServiceProxy.init(this, getMainLooper(), null);

@@ -1,16 +1,16 @@
 /*
-* Tencent is pleased to support the open source community by making Mars available.
-* Copyright (C) 2016 THL A29 Limited, a Tencent company. All rights reserved.
-*
-* Licensed under the MIT License (the "License"); you may not use this file except in 
-* compliance with the License. You may obtain a copy of the License at
-* http://opensource.org/licenses/MIT
-*
-* Unless required by applicable law or agreed to in writing, software distributed under the License is
-* distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
-* either express or implied. See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Tencent is pleased to support the open source community by making Mars available.
+ * Copyright (C) 2016 THL A29 Limited, a Tencent company. All rights reserved.
+ *
+ * Licensed under the MIT License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ * http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.tencent.mars.sample.wrapper.service;
 
@@ -18,6 +18,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.RemoteException;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.tencent.mars.BaseEvent;
 import com.tencent.mars.app.AppLogic;
 import com.tencent.mars.sample.utils.print.BaseConstants;
@@ -34,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -71,6 +73,9 @@ public class MarsServiceStub extends MarsService.Stub implements StnLogic.ICallB
     @Override
     public int send(final MarsTaskWrapper taskWrapper, Bundle taskProperties) throws RemoteException {
         final StnLogic.Task _task = new StnLogic.Task(StnLogic.Task.EShort, 0, "", null);
+        if (taskWrapper.getTaskId() != -1) {
+            _task.taskID = taskWrapper.getTaskId();
+        }
 
         // Set host & cgi path
         final String host = taskProperties.getString(MarsTaskProperty.OPTIONS_HOST);
@@ -175,6 +180,19 @@ public class MarsServiceStub extends MarsService.Stub implements StnLogic.ICallB
         }
     }
 
+    private void showData(int cmdid, byte[] data) {
+        String[] bytes = new String[data.length];
+        try {
+            for (int i = 0; i < data.length; i++) {
+                bytes[i] = intTohex(0xff & data[i]);
+            }
+            String strResult = Arrays.toString(bytes);
+            LogUtils.vTag("Test", "taskid:" + cmdid + ", data:" + strResult);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void trafficData(int send, int recv) {
         onPush(BaseConstants.FLOW_CMDID, String.format("%d,%d", send, recv).getBytes(Charset.forName("UTF-8")));
@@ -191,6 +209,30 @@ public class MarsServiceStub extends MarsService.Stub implements StnLogic.ICallB
         // identifyReqBuf.write();
 
         return StnLogic.ECHECK_NEVER;
+    }
+
+    /**
+     * @param n
+     * @Title: intTohex
+     * @Description: int型转换成16进制
+     * @return: String
+     */
+    public static String intTohex(int n) {
+        StringBuffer s = new StringBuffer();
+        String a;
+        char[] b = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+        while (n != 0) {
+            s = s.append(b[n % 16]);
+            n = n / 16;
+        }
+        a = s.reverse().toString();
+        if ("".equals(a)) {
+            a = "00";
+        }
+        if (a.length() == 1) {
+            a = "0" + a;
+        }
+        return a;
     }
 
     @Override
@@ -260,6 +302,7 @@ public class MarsServiceStub extends MarsService.Stub implements StnLogic.ICallB
             return StnLogic.RESP_FAIL_HANDLE_TASK_END;
         }
 
+        showData(taskID, respBuffer);
         try {
             return wrapper.buf2resp(respBuffer);
 

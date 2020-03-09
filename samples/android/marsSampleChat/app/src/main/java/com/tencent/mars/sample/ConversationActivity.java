@@ -18,6 +18,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -55,7 +56,7 @@ public class ConversationActivity extends AppCompatActivity {
 
     private static final String TAG = "Mars.Sample.ConversationActivity";
 
-    private static final String CONVERSATION_HOST = "192.168.8.108"; // using preset ports
+    private static final String CONVERSATION_HOST = "120.25.238.4"; // using preset ports
 
     private int conversationFilterType = Main.ConversationListRequest.FilterType.DEFAULT_VALUE;
 
@@ -260,6 +261,11 @@ public class ConversationActivity extends AppCompatActivity {
                         }
                     }
                 });
+            }
+
+            @Override
+            public int getTaskId() throws RemoteException {
+                return -1;
             }
 
         };

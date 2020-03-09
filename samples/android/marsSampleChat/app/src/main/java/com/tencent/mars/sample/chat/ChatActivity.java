@@ -30,6 +30,7 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -125,6 +126,8 @@ public class ChatActivity extends AppCompatActivity implements Observer {
         });
 
         if (!SampleApplicaton.hasSetUserName) {
+            LinearLayout llRoot = new LinearLayout(this);
+            llRoot.setOrientation(LinearLayout.VERTICAL);
             final EditText editText = new EditText(this);
             editText.setText("13055253351");
             editText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(12)});

@@ -16,10 +16,12 @@ package com.tencent.mars.sample.chat;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.os.RemoteException;
 import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.ConvertUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.tencent.mars.sample.SampleApplicaton;
 import com.tencent.mars.sample.chat.proto.Chat;
 import com.tencent.mars.sample.proto.Main;
@@ -31,6 +33,7 @@ import com.tencent.mars.xlog.Log;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Text messaging task
@@ -38,7 +41,7 @@ import java.util.Arrays;
  * Created by zhaoyuan on 16/2/29.
  */
 @TaskProperty(
-        host = "192.168.8.108",
+        host = "120.25.238.4",
         path = "/mars/sendmessage",
         cmdID = Main.CmdID.CMD_ID_SEND_MESSAGE_VALUE,
         longChannelSupport = true,
@@ -46,6 +49,11 @@ import java.util.Arrays;
 )
 public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest.Builder, Chat.SendMessageResponse.Builder> {
 
+    /**
+     * 用来获取taskId也就是seq
+     */
+    private static AtomicInteger ai = new AtomicInteger(0);
+    private final int taskID;
     //主信令
     private int mainId;
     //手机号
@@ -62,6 +70,7 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
 
     public TextMessageTask(int mainId, String phone, byte[] body) {
         super(Chat.SendMessageRequest.newBuilder(), Chat.SendMessageResponse.newBuilder());
+        this.taskID = ai.incrementAndGet();
         this.mainId = mainId;
         this.phone = phone;
         this.body = body;
@@ -115,7 +124,7 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
         if (body != null) {
             System.arraycopy(body, 0, result, byteSize - 2 - body.length, body.length);
         }
-        byte[] marsHeader = getMockMarsHeader(byteSize);
+        byte[] marsHeader = getMockMarsHeader(this.taskID, byteSize);
         //根据allByte生成校验码
         byte[] allByte = new byte[marsHeader.length + result.length - 2];
         System.arraycopy(marsHeader, 0, allByte, 0, marsHeader.length);
@@ -127,6 +136,31 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
         //包尾，1个字节
         result[byteSize - 1] = 0x0d;
         return result;
+    }
+
+    /**
+     * @param n
+     * @Title: intTohex
+     * @Description: int型转换成16进制
+     * @return: String
+     */
+    public static String intTohex(int n) {
+        int num = 0xff & n;
+        StringBuffer s = new StringBuffer();
+        String a;
+        char[] b = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+        while (num != 0) {
+            s = s.append(b[num % 16]);
+            num = num / 16;
+        }
+        a = s.reverse().toString();
+        if ("".equals(a)) {
+            a = "00";
+        }
+        if (a.length() == 1) {
+            a = "0" + a;
+        }
+        return a;
     }
 
     /**
@@ -143,7 +177,7 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
         return code;
     }
 
-    private byte[] getMockMarsHeader(int bodySize) {
+    private byte[] getMockMarsHeader(int seq, int bodySize) {
         byte[] marsHeader = new byte[22];
         marsHeader[0] = 0x29;
         marsHeader[1] = 0x29;
@@ -166,11 +200,13 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
         marsHeader[12] = 0x00;
         marsHeader[13] = 0x03;
 
+        byte[] seqArray = getLength(seq);
         //seq
-        marsHeader[14] = 0x00;
-        marsHeader[15] = 0x00;
-        marsHeader[16] = 0x00;
-        marsHeader[17] = 0x02;
+//        marsHeader[14] = 0x00;
+//        marsHeader[15] = 0x00;
+//        marsHeader[16] = 0x00;
+//        marsHeader[17] = 0x02;
+        System.arraycopy(seqArray, 0, marsHeader, 14, seqArray.length);
 
         //body_length
         byte[] bodyLength = getLength(bodySize);
@@ -229,6 +265,11 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
         }
 
         uiHandler.post(callback);
+    }
+
+    @Override
+    public int getTaskId() throws RemoteException {
+        return this.taskID;
     }
 
     public TextMessageTask onOK(Runnable onOK) {
