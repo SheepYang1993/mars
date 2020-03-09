@@ -101,6 +101,7 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
     public byte[] req2buf() {
         byte[] byPhone = null;
         if (!TextUtils.isEmpty(phone) && phone.length() == 11) {
+            //构造手机BCD码
             byPhone = str2Bcd(phone);
         }
         int byteSize = 5;
@@ -177,6 +178,12 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
         return code;
     }
 
+    /**
+     * 模拟请求头
+     * @param seq
+     * @param bodySize
+     * @return
+     */
     private byte[] getMockMarsHeader(int seq, int bodySize) {
         byte[] marsHeader = new byte[22];
         marsHeader[0] = 0x29;
