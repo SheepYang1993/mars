@@ -1,5 +1,6 @@
 package com.tencent.mars.sample;
 
+import android.os.RemoteException;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -30,8 +31,8 @@ public class MarsServiceProxyTest {
     private static final String TAG = "MarsServiceProxyTest";
 
     @TaskProperty(
-        host = "120.25.238.4",
-        path = "/mars/sendmessage"
+            host = "120.25.238.4",
+            path = "/mars/sendmessage"
     )
     class TestJsonMarsTaskWrapper extends JsonMarsTaskWrapper {
 
@@ -68,6 +69,11 @@ public class MarsServiceProxyTest {
 
             this.errType = errType;
             this.errCode = errCode;
+        }
+
+        @Override
+        public int getTaskId() throws RemoteException {
+            return -1;
         }
     }
 
