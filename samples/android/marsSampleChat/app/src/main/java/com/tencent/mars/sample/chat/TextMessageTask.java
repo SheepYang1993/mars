@@ -18,21 +18,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.RemoteException;
 import android.text.TextUtils;
-import android.widget.Toast;
 
-import com.blankj.utilcode.util.ConvertUtils;
-import com.blankj.utilcode.util.LogUtils;
 import com.tencent.mars.sample.SampleApplicaton;
 import com.tencent.mars.sample.chat.proto.Chat;
 import com.tencent.mars.sample.proto.Main;
-import com.tencent.mars.sample.utils.print.MemoryDump;
 import com.tencent.mars.sample.wrapper.TaskProperty;
 import com.tencent.mars.sample.wrapper.remote.NanoMarsTaskWrapper;
 import com.tencent.mars.stn.StnLogic;
-import com.tencent.mars.xlog.Log;
 
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -124,7 +117,7 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
         System.arraycopy(marsHeader, 0, allByte, 0, marsHeader.length);
         System.arraycopy(result, 0, allByte, marsHeader.length, result.length - 2);
         byte code = 0;
-        code = getCheckCode(allByte);
+        code = getCheckXor(allByte);
         //校验码，1个字节
         result[byteSize - 2] = code;
         //包尾，1个字节
@@ -158,12 +151,12 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
     }
 
     /**
-     * 生成校验码
+     * 生成异或校验码
      *
      * @param bytes
      * @return
      */
-    private byte getCheckCode(byte[] bytes) {
+    private byte getCheckXor(byte[] bytes) {
         byte code = 0;
         for (byte b : bytes) {
             code ^= b;
