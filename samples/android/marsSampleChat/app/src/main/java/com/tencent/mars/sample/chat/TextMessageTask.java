@@ -54,8 +54,6 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
      */
     private static AtomicInteger ai = new AtomicInteger(0);
     private final int taskID;
-    //主信令
-    private int mainId;
     //手机号
     private String phone;
     private byte[] body;
@@ -68,10 +66,9 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
 
     private Handler uiHandler = new Handler(Looper.getMainLooper());
 
-    public TextMessageTask(int mainId, String phone, byte[] body) {
+    public TextMessageTask(String phone, byte[] body) {
         super(Chat.SendMessageRequest.newBuilder(), Chat.SendMessageResponse.newBuilder());
         this.taskID = ai.incrementAndGet();
-        this.mainId = mainId;
         this.phone = phone;
         this.body = body;
         request.setAccessToken("test_token");
@@ -104,7 +101,8 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
             //构造手机BCD码
             byPhone = str2Bcd(phone);
         }
-        int byteSize = 5;
+        //body最小长度=校验码+包尾
+        int byteSize = 2;
         if (body != null && body.length > 0) {
             byteSize += body.length;
         }
@@ -112,11 +110,6 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
             byteSize += byPhone.length;
         }
         byte[] result = new byte[byteSize];
-        //主信令，1个字节
-        result[0] = (byte) mainId;
-        //包长，2个字节
-        byte[] bodyLength = getBodyLength(byteSize - 3);
-        System.arraycopy(bodyLength, 0, result, 1, bodyLength.length);
         //手机号码，6个字节
         if (byPhone != null) {
             System.arraycopy(byPhone, 0, result, 3, byPhone.length);
@@ -180,6 +173,7 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
 
     /**
      * 模拟请求头
+     *
      * @param seq
      * @param bodySize
      * @return

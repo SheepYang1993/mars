@@ -213,7 +213,7 @@ public class ChatActivity extends AppCompatActivity implements Observer {
             mPhone = "000000000000";
         }
         byte[] body = str2HexByte(message);
-        MarsServiceProxy.send(new TextMessageTask(0xe3, mPhone, body)
+        MarsServiceProxy.send(new TextMessageTask(mPhone, body)
                 .onOK(new Runnable() {
 
                     @Override
