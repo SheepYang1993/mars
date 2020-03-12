@@ -38,7 +38,6 @@ public abstract class AbstractTaskWrapper extends MarsTaskWrapper.Stub {
             setHttpRequest(taskProperty.host(), taskProperty.path());
             setShortChannelSupport(taskProperty.shortChannelSupport());
             setLongChannelSupport(taskProperty.longChannelSupport());
-            setCmdID(taskProperty.cmdID());
         }
     }
 

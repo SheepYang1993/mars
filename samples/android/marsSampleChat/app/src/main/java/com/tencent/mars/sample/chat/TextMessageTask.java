@@ -34,11 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Created by zhaoyuan on 16/2/29.
  */
 @TaskProperty(
-        host = "120.25.238.4",
-        path = "/mars/sendmessage",
-        cmdID = Main.CmdID.CMD_ID_SEND_MESSAGE_VALUE,
-        longChannelSupport = true,
-        shortChannelSupport = false
+        host = "192.168.8.111"
 )
 public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest.Builder, Chat.SendMessageResponse.Builder> {
 
@@ -49,6 +45,7 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
     private final int taskID;
     //手机号
     private String phone;
+    private int cmdid;
     private byte[] body;
 
 
@@ -59,11 +56,13 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
 
     private Handler uiHandler = new Handler(Looper.getMainLooper());
 
-    public TextMessageTask(String phone, byte[] body) {
+    public TextMessageTask(int cmdid, String phone, byte[] body) {
         super(Chat.SendMessageRequest.newBuilder(), Chat.SendMessageResponse.newBuilder());
         this.taskID = ai.incrementAndGet();
         this.phone = phone;
         this.body = body;
+        this.cmdid = cmdid;
+        setCmdID(cmdid);
         request.setAccessToken("test_token");
         request.setFrom(SampleApplicaton.accountInfo.userName);
         request.setTo("all");
@@ -105,7 +104,7 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
         byte[] result = new byte[byteSize];
         //手机号码，6个字节
         if (byPhone != null) {
-            System.arraycopy(byPhone, 0, result, 3, byPhone.length);
+            System.arraycopy(byPhone, 0, result, 0, byPhone.length);
         }
         //body，任意字节
         if (body != null) {
@@ -123,31 +122,6 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
         //包尾，1个字节
         result[byteSize - 1] = 0x0d;
         return result;
-    }
-
-    /**
-     * @param n
-     * @Title: intTohex
-     * @Description: int型转换成16进制
-     * @return: String
-     */
-    public static String intTohex(int n) {
-        int num = 0xff & n;
-        StringBuffer s = new StringBuffer();
-        String a;
-        char[] b = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-        while (num != 0) {
-            s = s.append(b[num % 16]);
-            num = num / 16;
-        }
-        a = s.reverse().toString();
-        if ("".equals(a)) {
-            a = "00";
-        }
-        if (a.length() == 1) {
-            a = "0" + a;
-        }
-        return a;
     }
 
     /**
@@ -189,17 +163,11 @@ public class TextMessageTask extends NanoMarsTaskWrapper<Chat.SendMessageRequest
         marsHeader[9] = (byte) 0xc8;
 
         //cmdid
-        marsHeader[10] = 0x00;
-        marsHeader[11] = 0x00;
-        marsHeader[12] = 0x00;
-        marsHeader[13] = 0x03;
+        byte[] cmdidArray = getLength(cmdid);
+        System.arraycopy(cmdidArray, 0, marsHeader, 10, cmdidArray.length);
 
-        byte[] seqArray = getLength(seq);
         //seq
-//        marsHeader[14] = 0x00;
-//        marsHeader[15] = 0x00;
-//        marsHeader[16] = 0x00;
-//        marsHeader[17] = 0x02;
+        byte[] seqArray = getLength(seq);
         System.arraycopy(seqArray, 0, marsHeader, 14, seqArray.length);
 
         //body_length
